@@ -1,7 +1,7 @@
+# $Id: Draw.pm,v 1.8 2004/05/14 05:39:25 gene Exp $
+
 package Games::Chess::Coverage::Draw;
-
-$VERSION = '0.0101';
-
+$VERSION = '0.0102';
 use strict;
 use warnings;
 use Carp;
@@ -73,6 +73,7 @@ sub add_rule {  # {{{
 # $VAR1 = {};
 # i.e., an empty hashref is created for undef @_ under strict.
 
+    # XXX Naive and insecure:
     # Make sure that the class is a perl module.
     eval "require $class";
     return if $@ and warn( "Error: $@" );
@@ -89,8 +90,8 @@ sub add_rule {  # {{{
         rule => \&{ $class .'::'. $rule }
     };
 
-    # Import the rule arguments so the other plugins can use them as
-    # "$self->{$args{whatever}}"
+    # Import the rule arguments into the object itself so that the other
+    # plugins can magically use them as $self->{ $args{whatever} }.
     $self->{$_} = $args{$_} for keys %args;
 
     warn "Rule: $rule $self->{rules}{$rule}{rule} added.\n"
@@ -140,11 +141,12 @@ Games::Chess::Coverage::Draw - Base class for visualizing chess coverage
 
 =head1 DESCRIPTION
 
-Represent chess coverage with a drawing module such as C<GD> or
-C<Imager> and plug-in rules based on board settings.
+Visually represent chess coverage with a drawing module such as C<GD>
+or C<Imager> and custom plug-in rules.
 
-This module is the base class for specific drawing modules and is not
-to be used directly.
+This module represents the base class for specific drawing modules
+and should not to be used directly.  Please refer to the C<SEE ALSO>
+section, below.
 
 =begin html
 
@@ -176,24 +178,22 @@ Here are the construction options with their default settings:
   square_width  => 33,
   square_height => 33
 
-Object arguments computed on initialization:
+These object attributes are computed on initialization:
 
   image_width, image_height,
   x0, y0, x1, y1
 
 =head2 add_rule
 
-  $drawing->add_rule( $rule, \%colors );
+  $drawing->add_rule( $rule, \%colors_etc );
 
-Add a C<Games::Chess::Coverage::Draw> plugin where the rule is a
-package containing a subroutine named for itself.  The rules are
-kept in an ordered list so that they can be applied in a determined
-sequence.
+Add a drawing plugin where the rule is a package containing a
+subroutine named for itself.  The rules are kept in an ordered list
+so that they can be applied in a determined sequence.
 
-Specific drawing modules such as C<Games::Chess::Coverage::Imager> or
-C<Games::Chess::Coverage::GD> must also define this method in order to
-create or allocate the necessary colors.  Please see the source code
-of these modules for the specific details involved.
+Specific drawing modules, that use C<Imager> or C<GD> for instance,
+must also define this method in order to create or allocate the
+necessary colors for that module.
 
 =head2 draw
 
@@ -213,17 +213,23 @@ L<Games::Chess::Coverage::GD>
 
 =head1 TO DO
 
-Make this an I<XBoard> engine.  Maybe draw a transparent image over 
-the board itself.
+Make this an I<XBoard> engine.  Draw a transparent image over the
+board itself.
 
-Describe the meta-API.  That is user defined pieces, rules and 
-colorings.
+Describe the meta-API of user defined pieces, rules and colorings.
 
 Figure out if I<ChessVision> already does this all better and then
-assimilate it's brains.
+assimilate its brains.
 
-=head1 CVS
+=head1 AUTHOR
 
-$Id: Draw.pm,v 1.7 2004/05/09 23:33:11 gene Exp $
+Gene Boggs E<lt>gene@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2004, Gene Boggs
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut

@@ -1,7 +1,7 @@
+# $Id$
+
 package Games::Chess::Coverage::Imager::Board;
-
-$VERSION = '0.0101';
-
+$VERSION = '0.0102';
 use strict;
 use warnings;
 use Carp;
@@ -167,9 +167,5 @@ Copyright 2004, Gene Boggs
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
-
-=head1 CVS
-
-$Id: Board.pm,v 1.17 2004/05/09 23:31:07 gene Exp $
 
 =cut

@@ -1,6 +1,8 @@
+# $Id: Arrows.pm,v 1.15 2004/05/14 05:39:26 gene Exp $
+
 package Games::Chess::Coverage::GD::Arrows;
 
-$VERSION = '0.0101_1';
+$VERSION = '0.0102_1';
 
 use strict;
 use warnings;
@@ -116,8 +118,6 @@ Required plug-in arguments:
 
 =head1 SEE ALSO
 
-The source code of this module.
-
 L<Games::Chess::Coverage>
 
 L<Games::Chess::Coverage::Draw>
@@ -141,6 +141,6 @@ it under the same terms as Perl itself.
 
 =head1 CVS
 
-$Id: Arrows.pm,v 1.14 2004/05/09 23:33:12 gene Exp $
+$Id: Arrows.pm,v 1.15 2004/05/14 05:39:26 gene Exp $
 
 =cut

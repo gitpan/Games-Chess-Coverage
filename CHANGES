@@ -1,5 +1,8 @@
 Changes file for Games::Chess::Coverage
 
+0.0102 Thu May 13 2004
+    - Cleaned POD.  No functionality changes.
+
 0.0101 Sun May 9 2004
     - Fixed the img URL in the POD.
     - Fixed the forgotten code in eg/Pieces.pm

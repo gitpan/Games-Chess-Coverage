@@ -1,9 +1,7 @@
-package Pieces;
+# $Id: Pieces.pm,v 1.4 2004/05/14 05:39:24 gene Exp $
 
-# That is "Games::Chess::GD::Pieces"
-
-$VERSION = '0.02';
-
+package Pieces;  # A.K.A. Games::Chess::GD::Pieces
+$VERSION = '0.0201';
 use strict;
 use warnings;
 use Carp;
@@ -67,9 +65,5 @@ Copyright 2004, Gene Boggs
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
-
-=head1 CVS
-
-$Id: Pieces.pm,v 1.3 2004/05/09 23:39:01 gene Exp $
 
 =cut

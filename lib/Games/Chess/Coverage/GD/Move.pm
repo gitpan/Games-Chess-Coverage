@@ -1,7 +1,7 @@
+# $Id: Move.pm,v 1.15 2004/05/14 05:39:26 gene Exp $
+
 package Games::Chess::Coverage::GD::Move;
-
-$VERSION = '0.0101';
-
+$VERSION = '0.0102';
 use strict;
 use warnings;
 use Carp;
@@ -77,9 +77,5 @@ Copyright 2004, Gene Boggs
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
-
-=head1 CVS
-
-$Id: Move.pm,v 1.14 2004/05/09 23:33:12 gene Exp $
 
 =cut

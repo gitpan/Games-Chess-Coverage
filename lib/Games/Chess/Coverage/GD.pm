@@ -1,7 +1,7 @@
+# $Id: GD.pm,v 1.9 2004/05/14 05:39:25 gene Exp $
+
 package Games::Chess::Coverage::GD;
-
-$VERSION = '0.01';
-
+$VERSION = '0.0101';
 use base 'Games::Chess::Coverage::Draw';
 use strict;
 use warnings;
@@ -141,8 +141,15 @@ L<Games::Chess::Coverage::Draw>
 
 L<GD>
 
-=head1 CVS
+=head1 AUTHOR
 
-$Id: GD.pm,v 1.8 2004/05/09 19:29:59 gene Exp $
+Gene Boggs E<lt>gene@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2004, Gene Boggs
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut

@@ -1,5 +1,7 @@
+# $Id: Coverage.pm,v 1.18 2004/05/14 05:39:25 gene Exp $
+
 package Games::Chess::Coverage;
-$VERSION = '0.0101';
+$VERSION = '0.0102';
 use strict;
 use warnings;
 use Carp;
@@ -359,11 +361,6 @@ __END__
 
 Games::Chess::Coverage - Expose the potential energy states of a chess game
 
-=head1 VERSION
-
-This document refers to $Revision: 1.17 $ of $RCSfile: Coverage.pm,v $
-last revised by $Author: gene $ on $Date: 2004/05/09 23:33:11 $.
-
 =head1 SYNOPSIS
 
   use Games::Chess::Coverage;
@@ -380,7 +377,7 @@ last revised by $Author: gene $ on $Date: 2004/05/09 23:33:11 $.
 A I<Games::Chess::Coverage> object represents a chess game in terms of 
 move and capture states by location.
 
-A piece's coverage extends within it's limit of mobility or until a
+A piece's coverage extends within its limit of mobility or until a
 collision occurs with another piece.
 
 In my mind this module:
@@ -422,8 +419,8 @@ optional attributes provided to the constructor as named parameters:
   Key      Default
   ________________
   verbose => 0
-  game  => new Games::Chess::Position
-  fen   => rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+  game => new Games::Chess::Position
+  fen => rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 
 That is, calling the constructor with no arguments creates a new 
 C<Games::Chess> object with the traditional starting board position.
