@@ -1,4 +1,4 @@
-# $Id: Draw.pm,v 1.8 2004/05/14 05:39:25 gene Exp $
+# $Id: Draw.pm,v 1.9 2004/06/08 04:02:21 gene Exp $
 
 package Games::Chess::Coverage::Draw;
 $VERSION = '0.0102';
@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp;
 
-sub new {  # {{{
+sub new {
     my( $proto, %args ) = @_;
     my $class = ref $proto || $proto;
     my $self = {
@@ -31,9 +31,9 @@ sub new {  # {{{
     bless $self, $class;
     $self->_init( %args );
     return $self;
-}  # }}}
+}
 
-sub _init {  # {{{
+sub _init {
     my( $self, %args ) = @_;
 
     # Check boundries
@@ -57,14 +57,14 @@ sub _init {  # {{{
     $self->{x1} = $self->{image_width}  - 1;
     $self->{y1} = $self->{image_height} - 1 - $self->{bottom_margin};
 
-    warn __PACKAGE__ . "::_init():\n",
-        join( "\n", map {
-            "\t$_: ". (defined $self->{$_} ? $self->{$_} : '')
-        } sort keys %$self ), "\n"
-        if $self->{verbose};
-}  # }}}
+    warn join( "\n",
+        __PACKAGE__ . '::_init():',
+        map { "\t$_: ". ($self->{$_} || '') } sort keys %$self
+    ), "\n"
+    if $self->{verbose};
+}
 
-sub add_rule {  # {{{
+sub add_rule {
     my $self  = shift;
     my $class = shift or croak "Rule given with no class";
     my %args  = @_;
@@ -78,46 +78,43 @@ sub add_rule {  # {{{
     eval "require $class";
     return if $@ and warn( "Error: $@" );
 
-    # The rule is a subroutine named for the class.
+    # The rule is (always) a subroutine named for the class.
     ( my $rule = $class ) =~ s/^.+?::(\w+)$/$1/;
 
-    # Keep an ordered list of rule names so we can apply them in a
-    # determined sequence.
+    # Keep an ordered list of rule names so that they can be
+    # applied in a determined sequence.
     push @{ $self->{rule_names} }, $rule;
 
-    # A rule is a code reference in the "rules" attribute.
-    $self->{rules}{$rule} = {
-        rule => \&{ $class .'::'. $rule }
-    };
+    # A rule is a code reference.
+    $self->{rules}{$rule} = \&{ $class .'::'. $rule };
 
     # Import the rule arguments into the object itself so that the other
     # plugins can magically use them as $self->{ $args{whatever} }.
     $self->{$_} = $args{$_} for keys %args;
+    warn join( "\n",
+        __PACKAGE__ .'::add_rule():',
+        "\t$rule=$self->{rules}{$rule}",
+        map { "\t$_: ". ($args{$_} || '') } sort keys %args
+    ), "\n"
+    if $self->{verbose};
+}
 
-    warn "Rule: $rule $self->{rules}{$rule}{rule} added.\n"
-        if $self->{verbose};
-}  # }}}
-
-sub draw {  # {{{
+sub draw {
     my $self = shift;
 
-    # Draw a board if there is a rule for it.
-    if( exists $self->{rules}{Board}{rule} ) {
-        $self->{rules}{Board}{rule}->( $self );
-        warn "Board $self->{rules}{Board}{rule} drawn\n"
-            if $self->{verbose};
-    };
+    # Always draw a board first if there is a rule for it.
+    $self->{rules}{Board}->( $self ) if exists $self->{rules}{Board};
+    # ..and then remove it from the sequence of rules to execute.
+    my $rules = [ grep { $_ ne 'Board' } @{ $self->{rule_names} } ];
 
     # For each square...
     for my $x ( 0 .. $self->{max_coord} ) {
         for my $y ( 0 .. $self->{max_coord} ) {
             # Draw the cell coverage visuals
-            for my $name (
-                # ..except the board that we already drew.
-                grep { $_ ne 'Board' } @{ $self->{rule_names} }
-            ) {
-                # A rule is a named callback in the rules array.
-                $self->{rules}{$name}{rule}->(
+            for my $name ( @$rules ) {
+                # A rule is a callback in the rules list.
+                $self->{rules}{$name}->(
+                    # XXX Uhh. Why do I give the object as an argument to the method?
                     $self,
                     x => $x,
                     y => $y,
@@ -129,7 +126,7 @@ sub draw {  # {{{
             }
         }
     }
-}  # }}}
+}
 
 1;
 

@@ -2,8 +2,7 @@ BEGIN {
     use strict;
     use warnings;
     use Data::Dumper;
-    $Data::Dumper::Terse = 1;
-    $Data::Dumper::Indent = 1;
+    $Data::Dumper::Terse = $Data::Dumper::Indent = 1;
     use Test::More 'no_plan';#tests => 1;
     use_ok 'Games::Chess::Coverage';
 }
@@ -11,22 +10,20 @@ BEGIN {
 # Can we create a default object?
 my $obj = eval {
     Games::Chess::Coverage->new(
-#        debug => 1,
+#        verbose => 1,
     );
 };
 print $@ if $@;
 isa_ok $obj, 'Games::Chess::Coverage',
     'Instance created with no arguments';
-#use Data::Dumper;warn Dumper($obj);
-#use Data::Dumper;warn Dumper( $obj->{cells} );
+
+#warn Dumper( $obj->{cells} );
+#warn Dumper([sort keys %{$obj->pieces}]);
+#warn Dumper($obj->pieces->{'00'});
 
 # Did we create a game object?
-isa_ok $obj->{game}, 'Games::Chess::Position', 'The game attribute';
-#print $obj->{game}->to_text(), "\n";
-
-# Check pieces/locations
-#use Data::Dumper;warn Dumper([sort keys %{$obj->pieces}]);
-#use Data::Dumper;warn Dumper($obj->pieces->{'00'});
+isa_ok $obj->game, 'Games::Chess::Position', 'The game attribute';
+#print $obj->game->to_text(), "\n";
 
 # Locations that should have pieces.
 my @xy = qw(
@@ -71,8 +68,30 @@ ok( ( grep { not $obj->pieces->{$_} } @xy ),
 ok( ( grep { not $obj->pieces->{$_} } @xy ),
     'No bogus locations' );
 
-#use Data::Dumper;warn Dumper($obj->pieces);
-#use Data::Dumper;#warn Dumper($obj->states);
-#open STATES, '>states.txt'; print FH Dumper($obj->states); close FH;
-
-__END__
+# Test PGN handling.
+$obj = eval {
+    Games::Chess::Coverage->new(
+#        verbose => 1,
+        pgn => 'eg/sample.pgn',
+    );
+};
+warn $@ if $@;
+isa_ok $obj, 'Games::Chess::Coverage', 'with PGN';
+$obj->build_game( 0, 0 );
+is $obj->{fen},
+    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    'starting position';
+$obj->build_game( 0, 1 );
+is $obj->{fen},
+    'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3',
+    'first ply';
+$obj->build_game( 0, -2 );
+is $obj->{fen},
+    '6R1/2r1bp1n/3N3k/p3P1p1/2p3P1/PbP4P/5B2/4R1K1 w - -',
+    'penultimate ply';
+$obj->build_game( 0, -1 );
+is $obj->{fen},
+    '6R1/2r1bN1n/7k/p3P1p1/2p3P1/PbP4P/5B2/4R1K1 b - -',
+    'last ply';
+$obj->build_game( 0, 1000 );
+is $obj->{fen}, undef, 'not a ply';

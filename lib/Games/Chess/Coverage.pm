@@ -1,60 +1,121 @@
-# $Id: Coverage.pm,v 1.18 2004/05/14 05:39:25 gene Exp $
+# $Id: Coverage.pm,v 1.22 2004/08/05 01:50:14 gene Exp $
 
 package Games::Chess::Coverage;
-$VERSION = '0.0102';
+$VERSION = 0.02;
 use strict;
 use warnings;
 use Carp;
 use Games::Chess qw( :constants :functions );
+use Chess::PGN::Filter;
 
-sub new {  # {{{
+sub new {
     my( $class, %args ) = @_;
     my $self = {
         verbose => 0,
-        # The width of the chessboard
-        size => 7,
-        # A Games::Chess::Position object.
-        game => undef,
-        # Usually this is FEN.
-        fen => undef,
-        # The piece name keyed rules for how to update the cells list.
-        rules  => undef,
-        states => undef,
-        pieces => undef,
         piece_names => [qw( bishop king knight pawn queen rook )],
-        %args,  # Add arbitrary settings on creation
+        game_number => 1,  # Number of the PGN game.
+        ply_number  => 0,  # Number of the game's ply.
+        pgn_dom     => undef,
+        fen    => undef,   # Forsythe-Edwards Notation string.
+        pgn    => undef,   # Portable Game Notation string or file.
+        game   => undef,   # Games::Chess::Position object.
+        rules  => undef,   # Defined constraints.
+        states => undef,   # Computed board state.
+        pieces => undef,   # Location lookup table of G::C::Pieces.
+        size   => 7,       # Width of the chessboard.
+        %args,             # Add arbitrary settings on creation
     };
     bless $self, $class;
     $self->_init;
     return $self;
-}  # }}}
+}
 
-# Set the game and piece rules.
-sub _init {  # {{{
+sub _init {
     my $self = shift;
 
-    # Create a new game if we are handed a FEN notation string.  If 
-    # neither a game object nor notation are given, G:C:P sets the
-    # default game.
-    $self->{game} = Games::Chess::Position->new( $self->{fen} )
-        if $self->{fen} or not( $self->{game} );
-    warn "Game initialized: $self->{game}\n" if $self->{verbose};
+    $self->build_rules;
 
-    # Set the callback for each piece name if one exists in the
-    # package.
+    # Create a new game unless we're given one.
+    if( $self->{game} ) {
+        $self->{fen} = $self->{game}->to_FEN;
+        warn "FEN initialized: $self->{fen}\n" if $self->{verbose};
+    }
+    else {
+        $self->build_game;
+    }
+}
+
+# Build a disptch table of callbacks for each piece.
+sub build_rules {
+    my $self = shift;
+
     $self->{rules} = {
         map { $_ => __PACKAGE__->can( $_ ) && \&{ $_ } }
             @{ $self->{piece_names} }
     };
-    warn 'Rules initialized: ',
-        join( ', ', keys %{ $self->{rules} } ), "\n"
+    warn 'Piece movement rules initialized: ',
+        join( ', ', sort keys %{ $self->{rules} } ), "\n"
         if $self->{verbose};
-}  # }}}
+}
+
+sub build_game {
+    my( $self, $i, $j ) = @_;
+
+    $self->{game_number} = $i if defined $i;
+    $self->{ply_number} = $j if defined $j;
+
+    $self->{pgn_dom} = filter(
+        source => $self->{pgn},
+        filtertype => 'DOM',
+        verbose => 0,
+    ) if $self->{pgn};
+#use Data::Dumper;warn Dumper($self->{pgn_dom});
+
+    $self->{fen} = $self->extract_ply;
+
+    $self->{game} = Games::Chess::Position->new( $self->{fen} );
+    warn "Game initialized: $self->{game}\n" if $self->{verbose};
+}
+
+# The FEN is deep within a Chess::PGN::Filter DOM.
+# Game numbers are 1 .. n and Move numbers are 0 .. m where the
+# "zeroth ply" is the API default starting position and the
+# -1st, -2nd, etc. array indices work as expected.
+sub extract_ply {
+    my $self = shift;
+
+    $self->{fen} = $self->{ply_number} && $self->{pgn_dom}
+        ? $self->{pgn_dom}[
+                $self->{game_number} - ($self->{game_number} < 0 ? 0 : 1)
+            ]{Gametext}[
+                $self->{ply_number} - ($self->{ply_number} < 0 ? 0 : 1)
+            ]{Epd}
+        : 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+    warn "FEN: $self->{fen}\n" if $self->{fen} && $self->{verbose};
+
+    return $self->{fen};
+}
+
+sub number_of_games {
+    my $self = shift;
+    return unless $self->{pgn_dom};
+    return scalar @{ $self->{pgn_dom} };
+}
+
+sub number_of_ply {
+    my $self = shift;
+    return unless $self->{pgn_dom};
+    my $game = shift || $self->{game_number};
+    return scalar @{
+        $self->{pgn_dom}[ $game - ($game < 0 ? 0 : 1) ]{Gametext}
+    };
+}
 
 sub game { return shift->{game} }
 
-# Return a hash reference of pieces keyed by locations.
-sub pieces {  # {{{
+# Return a hash reference of G-C pieces keyed by locations.
+sub pieces {
     my $self = shift;
     my %pieces;
 
@@ -72,10 +133,10 @@ sub pieces {  # {{{
     }
 
     return $self->{pieces};
-}  # }}}
+}
 
-# Return a hash reference of cell states keyed by location and color.
-sub states {  # {{{
+# Return a hash reference of cell states keyed by color and location.
+sub states {
     my $self = shift;
     # Fetch the uncached pieces.
     unless( $self->{states} ) {
@@ -88,19 +149,10 @@ sub states {  # {{{
         }
     }
     return $self->{states};
-}  # }}}
-
-# Execute the callback subroutine for the given piece.
-sub cover {  # {{{
-    my( $self, $loc, $p ) = @_;
-    my $callback = $self->{rules}{ $p->piece_name } || 0;
-    warn sprintf "Where: %s, Who: %s, How: %s\n",
-        $loc, $p, $callback if $self->{verbose};
-    $callback->( $self, $loc ) if $callback;
-}  # }}}
+}
 
 # The deceptively lowly pawn.
-sub pawn {  # {{{
+sub pawn {
     my( $self, $location ) = @_;
     my( $piece, $x, $y, $direction ) =
         $self->piece_vector( $location );
@@ -138,9 +190,9 @@ sub pawn {  # {{{
         rank  => $y,
         en_passant => 1,
     ) for -1, 1;
-}  # }}}
+}
 
-sub rook {  # {{{
+sub rook {
     my( $self, $location ) = @_;
     my( $piece, $x, $y ) = $self->piece_vector( $location );
 
@@ -178,9 +230,9 @@ sub rook {  # {{{
             rank  => $_,
         );
     }
-}  # }}}
+}
 
-sub bishop {  # {{{
+sub bishop {
     my( $self, $location ) = @_;
     my( $piece, $x, $y ) = $self->piece_vector( $location );
 
@@ -218,13 +270,13 @@ sub bishop {  # {{{
             rank  => $y + $_,
         );
     }
-}  # }}}
+}
 
-sub queen {  # {{{
+sub queen {
     return rook( @_ ), bishop( @_ );
-}  # }}}
+}
 
-sub knight {  # {{{
+sub knight {
     my( $self, $location ) = @_;
     my( $piece, $x, $y ) = $self->piece_vector( $location );
 
@@ -236,9 +288,9 @@ sub knight {  # {{{
         rank  => $y + $_->[1],
     ) for [ 1, 2], [ 2, 1], [ 2,-1], [ 1,-2],
           [-1,-2], [-2,-1], [-2, 1], [-1, 2];
-}  # }}}
+}
 
-sub king {  # {{{
+sub king {
     my( $self, $location ) = @_;
     my( $piece, $x, $y ) = $self->piece_vector( $location );
 
@@ -259,10 +311,20 @@ sub king {  # {{{
         rank   => $y,
         castle => 1,
     ) for -2, 2;
-}  # }}}
+}
 
-# Add cell metadata to the cells array if we can move to that location.
-sub _update_cells {  # {{{
+# Execute the callback subroutine for the given piece.
+sub cover {
+    my( $self, $loc, $p ) = @_;
+    my $callback = $self->{rules}{ $p->piece_name } || 0;
+    warn sprintf "Where: %s, Who: %s, How: %s\n",
+        $loc, $p, $callback
+        if $self->{verbose};
+    $callback->( $self, $loc ) if $callback;
+}
+
+# Add cell metadata to states if we can move-to or attack the given location.
+sub _update_cells {
     my( $self, %args ) = @_;
     # self, piece, rank, file, marching, en_passant, castle
 
@@ -295,7 +357,6 @@ sub _update_cells {  # {{{
         @{ $state->{$enemy}{capture} }
         ? 1 : 0;
 
-    # En passant and castling are treated separately.
     unless( $args{en_passant} || $args{castle} || $king_check ) {
         # Can I move here?
         push @{
@@ -320,46 +381,42 @@ sub _update_cells {  # {{{
     # For bishops and rooks: Stop if someone is in the way.  Keep on
     # keepin' on if not.
     return $cell->colour == EMPTY ? 1 : 0;
-}  # }}}
+}
 
 # Return the position occupancy status.
-sub whoami {  # {{{
+sub whoami {
     my( $self, $location ) = @_;
-    my $p = $self->pieces->{$location} || 0;
+    my $p = $self->pieces()->{$location} || 0;
     return sprintf "%s at %s",
-        ( $p ? $p->colour_name.' '.$p->piece_name : 'empty' ),
+        ($p ? $p->colour_name.' '.$p->piece_name : 'empty'),
         $location;
-}  # }}}
+}
 
-sub piece_vector {  # {{{
+sub piece_vector {
     my( $self, $location ) = @_;
 
     # Who are we?
-    my $piece = $self->pieces->{$location} ||
-        croak "Can't call pawn() for $location with no location occupant.";
-
-    warn 'Me: ', $self->whoami( $location ), "\n" if $self->{verbose};
-
-    # The direction of movement depends on our color.
-    my $direction = $piece->colour eq WHITE ? 1 : -1;
+    my $piece = $self->pieces()->{$location} ||
+        croak "Can't get a piece vector for $location without an occupant.";
 
     # Get the coordinate in a form we can do math on.
     my ( $x, $y ) = split //, $location;
 
+    # The direction of movement depends on our color.
+    my $direction = $piece->colour eq WHITE ? 1 : -1;
+
+    warn 'Me: ', $self->whoami( $location ), "\n" if $self->{verbose};
+
     return $piece, $x, $y, $direction;
-}  # }}}
+}
 
-#
-sub tension {  # {{{
-}  # }}}
 
-1;
 
 __END__
 
 =head1 NAME
 
-Games::Chess::Coverage - Expose the potential energy states of a chess game
+Games::Chess::Coverage - Expose the potential energy of chess games
 
 =head1 SYNOPSIS
 
@@ -369,16 +426,24 @@ Games::Chess::Coverage - Expose the potential energy states of a chess game
   $g = Games::Chess::Coverage->new( fen => $fen_string );
   $g = Games::Chess::Coverage->new( game => $games_chess_object );
 
-  $pieces = $g->pieces;
-  $states = $g->states;
+  $g = Games::Chess::Coverage->new( pgn => $pgn );
+  for my $game ( 1 .. $g->number_of_games ) {
+      for my $ply ( 0 .. $g->number_of_ply( $game ) ) {
+          $g->build_game( $game, $ply );
+          # Do something interesting like visualize with $g->pieces
+          # and $g->states...
+      }
+  }
 
 =head1 DESCRIPTION
 
 A I<Games::Chess::Coverage> object represents a chess game in terms of 
-move and capture states by location.
+move and capture state.
 
 A piece's coverage extends within its limit of mobility or until a
-collision occurs with another piece.
+collision occurs with another piece.  This includes the many special
+considerations that are part of chess like en passant capture and the
+fact that a king can't move into check, etc.
 
 In my mind this module:
 
@@ -390,7 +455,7 @@ In my mind this module:
 
 =item * Represents tension as a landscape
 
-=item * Shows footprint interference patterns (trends?)
+=item * Shows footprint interference patterns and trends
 
 =item * Delineates power stuggle
 
@@ -399,13 +464,11 @@ In my mind this module:
 =back
 
 B<Note:> This is not a chess playing module.  It simply returns the 
-state of a chess board.  If you want to know what the coverage might 
-be in say five ply, you must generate the FEN (or C<Games::Chess> 
-object) first.  Please see L</TO DO> for more details.
+state of a chess game at a particular moment.  If you want to know
+what the coverage might be in say five ply, you must either have the
+PGN or generate that slice of the game (in real-time, for instance :).
 
 =head1 PUBLIC METHODS
-
-=head2 CONSTRUCTOR
 
 =over 4
 
@@ -414,22 +477,18 @@ object) first.  Please see L</TO DO> for more details.
   $g = Games::Chess::Coverage->new( %attributes );
 
 Create a new I<Games::Chess::Coverage> object based on the following 
-optional attributes provided to the constructor as named parameters:
+attributes:
 
-  Key      Default
+  Key     Default
   ________________
   verbose => 0
+  fen  => rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
   game => new Games::Chess::Position
-  fen => rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+  number_of_games => 1
+  number_of_ply   => 0
 
-That is, calling the constructor with no arguments creates a new 
-C<Games::Chess> object with the traditional starting board position.
-
-=back
-
-=head2 ACCESSORS
-
-=over 4
+Calling the constructor with no arguments creates a single game with
+the traditional starting board position.
 
 =item * pieces
 
@@ -444,11 +503,22 @@ C<Games::Chess::Piece>'s keyed by their location.
 
 This method returns a hash reference of board location states.
 
-=back
+A state in the context of this module is ...
 
-=head2 CONVENIENCE METHODS
+=item * number_of_games
 
-=over 4
+  $n = $g->number_of_games;
+
+Return the number of games in the provided PGN.
+
+=item * number_of_ply
+
+  $p = $g->number_of_ply;
+  $p = $g->number_of_ply( $n );
+
+Return the number of ply (twice the number of moves) in a given game
+from the object's PGN.  If a game number is not provided, the current
+object C<game_number> attribute is used.
 
 =item * warp_spacetime
 
@@ -466,18 +536,21 @@ Until then, take a look at the eg directory in this distribution.
 
 =head1 TO DO
 
-Represent pawn promotion.
+B<Remove the dependence upon C<Games::Chess>.>
 
-Make this tiny and fast with bit vector matrix calculations.
+Abstract the cell updating method so that smoother inheritance can
+happen.
 
-Use C<Chess::PGN::Filter> and build a list of coverages for entire 
-games in PGN.
+Document the API extensibility by showing how "user defined" piece
+move/capture constraint callbacks may be created.
 
-Output ChessGML.
+Make this tiny and fast with bit vector matrix calculations?
 
 =head1 SEE ALSO
 
 L<Games::Chess>
+
+L<Games::Chess::Coverage::Draw>
 
 This is a great site:
 

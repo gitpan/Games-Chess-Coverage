@@ -1,5 +1,11 @@
 Changes file for Games::Chess::Coverage
 
+0.02 Sun Jun 27 2004
+    - Made the Makefile.PL show G-C-Draw installed plugin modules.
+    - Added game slice handling with Chess::PGN::Filter and handy
+      game/move extraction methods.
+    - Added the beginnings of SVG support.
+
 0.0102 Thu May 13 2004
     - Cleaned POD.  No functionality changes.
 
@@ -9,7 +15,7 @@ Changes file for Games::Chess::Coverage
     - Reran the eg/*_draw programs to generate the eg/ graphics
 
 0.01 Sun May 9 2004
-    - First respectable reslease.
+    - First respectable release.
 
 0.01_01 Sun Jan 11 02:13:18 2004
-    - Created by Module::Husbandry.
+    - Skeleton created with Module::Husbandry.
