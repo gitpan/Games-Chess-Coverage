@@ -1,6 +1,10 @@
 Changes file for Games::Chess::Coverage
 
-0.02 Sun Jun 27 2004
+0.0201 Thu Aug 5 2004
+    - Fixed the Changes date for release 0.02.
+    - Added the mysteriously absent Imager directroy.
+
+0.02 Wed Aug 4 2004
     - Made the Makefile.PL show G-C-Draw installed plugin modules.
     - Added game slice handling with Chess::PGN::Filter and handy
       game/move extraction methods.

@@ -1,7 +1,7 @@
-# $Id: Coverage.pm,v 1.22 2004/08/05 01:50:14 gene Exp $
+# $Id: Coverage.pm,v 1.23 2004/08/06 03:04:29 gene Exp $
 
 package Games::Chess::Coverage;
-$VERSION = 0.02;
+$VERSION = 0.0201;
 use strict;
 use warnings;
 use Carp;

@@ -13,6 +13,7 @@ lib/Games/Chess/Coverage/GD/Draw.pm
 lib/Games/Chess/Coverage/GD/Move.pm
 lib/Games/Chess/Coverage/GD/Threat.pm
 lib/Games/Chess/Coverage/Imager.pm
+lib/Games/Chess/Coverage/Imager/Board.pm
 lib/Games/Chess/Coverage/SVG.pm
 lib/Games/Chess/Coverage/SVG/Board.pm
 Makefile.PL
