@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Games::Chess::Coverage;
+use Games::Chess::Coverage::Imager;
+use Graphics::ColorNames 'hex2tuple';
+        
+my $v = shift || 0;
+    
+my %colors;
+tie %colors, 'Graphics::ColorNames';
+
+my %fen = (
+    move   => '7r/8/RQR5/8/8/8/8/8',
+    threat => '7r/8/RQR5/8/8/8/8/8',
+    arrows => '7r/8/RQR5/8/8/8/8/8',
+);
+
+my %apply = (  # {{{
+    board => sub {
+        my $drawing = shift;
+#        $drawing->add_rule( 'ImagerPieces' );
+    },
+    draw => sub {
+        my $drawing = shift;
+        $drawing->add_rule( 'Games::Chess::Coverage::Imager::Move',
+            white_move_color => '#33FF33',
+            black_move_color => '#00FFCC',
+            both_move_color  => '#FF6666',
+        );
+        $drawing->add_rule( 'Games::Chess::Coverage::Imager::Threat',
+            white_threat_color => '#000066',
+            black_threat_color => '#CC0033',
+        );
+    },
+    move => sub {
+        my $drawing = shift;
+        $drawing->add_rule( 'Games::Chess::Coverage::Imager::Move',
+            white_move_color => '#33FF33',
+            black_move_color => '#00FFCC',
+            both_move_color  => '#FF6666',
+        );
+    },
+    threat => sub {
+        my $drawing = shift;
+        $drawing->add_rule( 'Games::Chess::Coverage::Imager::Threat',
+            white_threat_color => '#000066',
+            black_threat_color => '#CC0033',
+        );
+    },
+    arrows => sub {
+        my $drawing = shift;
+        $drawing->add_rule( 'Games::Chess::Coverage::Imager::Arrows',
+            white_arrow_color => '#000066',
+            black_arrow_color => '#CC0033',
+        );  # Grrrrr!
+    },
+);  # }}}
+
+for my $action ( keys %apply ) {
+    $fen{$action} ||= 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+
+    my $cover = Games::Chess::Coverage->new(
+#        verbose => 1,
+        fen => $fen{$action},
+    );
+    if( $cover->{verbose} ) {
+        warn $cover->whoami($_), "\n"
+            for sort keys %{ $cover->pieces };
+        warn "----\n";
+    }
+
+    my $drawing = Games::Chess::Coverage::Imager->new(
+        verbose => $v,
+        coverage => $cover,
+        out_file => "eg/$action",
+        image_type => 'png',
+    );
+    warn "Building $action.$drawing->{image_type} for $fen{$action}\n",
+        $cover->game->to_text, "\n"
+        if $drawing->{verbose};
+#use Data::Dumper;warn Dumper(\$drawing);
+
+    $drawing->add_rule( 'Games::Chess::Coverage::Imager::Board',
+        board_color  => '#ffffff',#[255,255,255], #black
+        border       => 2,
+        border_color => '#000000',#[00,00,00], #'#000000', #white
+        letters      => 1,
+        letter_color => [0,0,255], #'#0000FF', #blue
+        grid         => 1,
+        grid_color   => [127,127,127], #'#505050', #grey
+    );
+
+    $apply{$action}->( $drawing );
+#use Data::Dumper;warn Dumper($drawing->{rules});
+
+    $drawing->draw;
+    $drawing->write;
+}
