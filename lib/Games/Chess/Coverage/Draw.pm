@@ -1,6 +1,6 @@
 package Games::Chess::Coverage::Draw;
 
-$VERSION = '0.01';
+$VERSION = '0.0101';
 
 use strict;
 use warnings;
@@ -148,7 +148,7 @@ to be used directly.
 
 =begin html
 
-  <img src="http://search.cpan.org/src/gene/Games-Chess-Coverage-0.01/eg/draw.gif"/>
+  <img src="http://search.cpan.org/src/GENE/Games-Chess-Coverage-0.01/eg/draw.gif"/>
 
 =end html
 
@@ -224,6 +224,6 @@ assimilate it's brains.
 
 =head1 CVS
 
-$Id: Draw.pm,v 1.6 2004/05/09 19:29:59 gene Exp $
+$Id: Draw.pm,v 1.7 2004/05/09 23:33:11 gene Exp $
 
 =cut

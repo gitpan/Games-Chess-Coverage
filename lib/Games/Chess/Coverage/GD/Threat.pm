@@ -1,6 +1,6 @@
 package Games::Chess::Coverage::GD::Threat;
 
-$VERSION = '0.01';
+$VERSION = '0.0101';
 
 use strict;
 use warnings;
@@ -52,7 +52,7 @@ Required plug-in arguments:
 
 =begin html
 
-  <img src="http://search.cpan.org/src/gene/Games-Chess-Coverage-0.01/eg/threat.gif"/>
+  <img src="http://search.cpan.org/src/GENE/Games-Chess-Coverage-0.01/eg/threat.gif"/>
 
 =end html
 
@@ -81,6 +81,6 @@ it under the same terms as Perl itself.
 
 =head1 CVS
 
-$Id: Threat.pm,v 1.17 2004/05/09 19:30:01 gene Exp $
+$Id: Threat.pm,v 1.18 2004/05/09 23:33:12 gene Exp $
 
 =cut

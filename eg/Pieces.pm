@@ -1,8 +1,8 @@
 package Pieces;
 
-# That is "Games::Chess GD Pieces"
+# That is "Games::Chess::GD::Pieces"
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 use strict;
 use warnings;
@@ -14,20 +14,23 @@ use Games::Chess qw( :functions );
 use vars qw( $gifs );
 
 sub Pieces {
-    my %args = @_;  # left top width height x y image colors coverage image
+    my( $self, %args ) = @_;
 
-    my $c = $args{coverage}->game->at( $args{x}, $args{y} )->code;
+    my $c = $self->{coverage}->game->at( $args{x}, $args{y} )->code;
     return if $c eq ' ';
 
     # Populate the image hash of piece glyphs if one does not exist.
     $gifs = Games::Chess::Position::piece_gifs unless keys %$gifs;
 
     # Copy the glyph to the evolving image.
-    $args{image}->copy(
+    $self->{image}->copy(
         $gifs->{$c},
-        $args{left},  $args{top},
-        0, 0,
-        $args{width}, $args{height}
+        $args{left},
+        $args{top},
+        0,
+        0,
+        $self->{square_width},
+        $self->{square_height}
     );
 }
 
@@ -37,7 +40,7 @@ __END__
 
 =head1 NAME
 
-Games::Chess::Coverage::GD::Pieces - Draw the pieces in Games::Chess
+Pieces - Draw the pieces in Games::Chess with GD
 
 =head1 DESCRIPTION
 
@@ -50,11 +53,9 @@ The source code of this file of course.
 
 L<Games::Chess>
 
-L<Games::Chess::Coverage>
-
 L<Games::Chess::Coverage::Draw>
 
-L<Games::Chess::Coverage::Analysis>
+L<GD>
 
 =head1 AUTHOR
 
@@ -69,6 +70,6 @@ it under the same terms as Perl itself.
 
 =head1 CVS
 
-$Id: Pieces.pm,v 1.2 2004/02/02 05:05:24 gene Exp $
+$Id: Pieces.pm,v 1.3 2004/05/09 23:39:01 gene Exp $
 
 =cut

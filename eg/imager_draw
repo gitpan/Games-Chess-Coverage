@@ -16,10 +16,11 @@ my %fen = (
     arrows => '7r/8/RQR5/8/8/8/8/8',
 );
 
+# These don't exist yet.  Go forth and be fruitful...
 my %apply = (  # {{{
     board => sub {
         my $drawing = shift;
-#        $drawing->add_rule( 'ImagerPieces' );
+        $drawing->add_rule( 'ImagerPieces' );
     },
     draw => sub {
         my $drawing = shift;

@@ -1,6 +1,6 @@
 package Games::Chess::Coverage::Imager::Board;
 
-$VERSION = '0.01';
+$VERSION = '0.0101';
 
 use strict;
 use warnings;
@@ -137,7 +137,7 @@ Required plug-in arguments with sample settings:
 
 =begin html
 
-  <img src="http://search.cpan.org/src/gene/Games-Chess-Coverage-0.01/eg/board.png"/>
+  <img src="http://search.cpan.org/src/GENE/Games-Chess-Coverage-0.01/eg/board.png"/>
 
 =end html
 
@@ -170,6 +170,6 @@ it under the same terms as Perl itself.
 
 =head1 CVS
 
-$Id: Board.pm,v 1.13 2004/05/08 23:41:22 gene Exp $
+$Id: Board.pm,v 1.17 2004/05/09 23:31:07 gene Exp $
 
 =cut

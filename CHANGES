@@ -1,5 +1,10 @@
 Changes file for Games::Chess::Coverage
 
+0.0101 Sun May 9 2004
+    - Fixed the img URL in the POD.
+    - Fixed the forgotten code in eg/Pieces.pm
+    - Reran the eg/*_draw programs to generate the eg/ graphics
+
 0.01 Sun May 9 2004
     - First respectable reslease.
 

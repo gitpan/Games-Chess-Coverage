@@ -116,7 +116,7 @@ Required plug-in arguments with sample settings:
 
 =begin html
 
-  <img src="http://search.cpan.org/src/gene/Games-Chess-Coverage-0.01/eg/board.gif"/>
+  <img src="http://search.cpan.org/src/GENE/Games-Chess-Coverage-0.01/eg/board.gif"/>
 
 =end html
 
@@ -145,6 +145,6 @@ it under the same terms as Perl itself.
 
 =head1 CVS
 
-$Id: Board.pm,v 1.16 2004/05/09 19:30:00 gene Exp $
+$Id: Board.pm,v 1.18 2004/05/09 23:33:12 gene Exp $
 
 =cut

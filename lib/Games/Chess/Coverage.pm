@@ -1,5 +1,5 @@
 package Games::Chess::Coverage;
-$VERSION = '0.01';
+$VERSION = '0.0101';
 use strict;
 use warnings;
 use Carp;
@@ -361,8 +361,8 @@ Games::Chess::Coverage - Expose the potential energy states of a chess game
 
 =head1 VERSION
 
-This document refers to $Revision: 1.16 $ of $RCSfile: Coverage.pm,v $
-last revised by $Author: gene $ on $Date: 2004/05/09 19:39:18 $.
+This document refers to $Revision: 1.17 $ of $RCSfile: Coverage.pm,v $
+last revised by $Author: gene $ on $Date: 2004/05/09 23:33:11 $.
 
 =head1 SYNOPSIS
 
@@ -467,21 +467,6 @@ Coming soon to a theatre near you...
 
 Until then, take a look at the eg directory in this distribution.
 
-=begin html
-
-And for all you web browsers out there:
-
-=for html
-  <img src="01.gif"/>
-  <img src="02.gif"/>
-  <br/>A contrived showdown in eg/.
-  <p/>
-  <img src="http://search.cpan.org/src/gene/Games-Chess-Coverage-0.01/eg/01.gif"/>
-  <img src="http://search.cpan.org/src/gene/Games-Chess-Coverage-0.01/eg/02.gif"/>
-  <br/>A contrived showdown at CPAN.
-
-=end html
-
 =head1 TO DO
 
 Represent pawn promotion.
@@ -539,9 +524,5 @@ Copyright 2004, Gene Boggs
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
-
-=head1 CVS
-
-$Id: Coverage.pm,v 1.16 2004/05/09 19:39:18 gene Exp $
 
 =cut

@@ -1,6 +1,6 @@
 package Games::Chess::Coverage::GD::Arrows;
 
-$VERSION = '0.01_1';
+$VERSION = '0.0101_1';
 
 use strict;
 use warnings;
@@ -110,7 +110,7 @@ Required plug-in arguments:
 
 =begin html
 
-  <img src="http://search.cpan.org/src/gene/Games-Chess-Coverage-0.01/eg/arrows.gif"/>
+  <img src="http://search.cpan.org/src/GENE/Games-Chess-Coverage-0.01/eg/arrows.gif"/>
 
 =end html
 
@@ -141,6 +141,6 @@ it under the same terms as Perl itself.
 
 =head1 CVS
 
-$Id: Arrows.pm,v 1.13 2004/05/09 19:30:00 gene Exp $
+$Id: Arrows.pm,v 1.14 2004/05/09 23:33:12 gene Exp $
 
 =cut

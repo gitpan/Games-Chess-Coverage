@@ -20,7 +20,7 @@ my %fen = (
 my %apply = (  # {{{
     board => sub {
         my $drawing = shift;
-#        $drawing->add_rule( 'GDPieces' );
+        $drawing->add_rule( 'Pieces' );
     },
     draw => sub {
         my $drawing = shift;

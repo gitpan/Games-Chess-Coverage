@@ -6,7 +6,6 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More' => 0,
         'Games::Chess' => 0,
-        'Graphics::ColorNames' => 0,
     },
     ($] >= 5.005
         ? (ABSTRACT_FROM => 'lib/Games/Chess/Coverage.pm',
