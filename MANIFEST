@@ -1,27 +1,7 @@
 CHANGES
-eg/gd_draw
-eg/imager_draw
-eg/Pieces.pm
-eg/sample.pgn
-eg/svg_draw
 lib/Games/Chess/Coverage.pm
-lib/Games/Chess/Coverage/Draw.pm
-lib/Games/Chess/Coverage/GD.pm
-lib/Games/Chess/Coverage/GD/Arrows.pm
-lib/Games/Chess/Coverage/GD/Board.pm
-lib/Games/Chess/Coverage/GD/Draw.pm
-lib/Games/Chess/Coverage/GD/Move.pm
-lib/Games/Chess/Coverage/GD/Threat.pm
-lib/Games/Chess/Coverage/Imager.pm
-lib/Games/Chess/Coverage/Imager/Board.pm
-lib/Games/Chess/Coverage/SVG.pm
-lib/Games/Chess/Coverage/SVG/Board.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-t/Games-Chess-Coverage-Draw.t
-t/Games-Chess-Coverage-GD.t
-t/Games-Chess-Coverage-Imager.t
-t/Games-Chess-Coverage-SVG.t
 t/Games-Chess-Coverage.t
 META.yml                                 Module meta-data (added by MakeMaker)

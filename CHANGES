@@ -1,5 +1,9 @@
 Changes file for Games::Chess::Coverage
 
+0.0201_1 Mon July 2 2007
+    - Mothballed. Retired. Put out to pasture in lieu of the vastly
+      superior Chess::Coverage module.
+
 0.0201 Thu Aug 5 2004
     - Fixed the Changes date for release 0.02.
     - Added the mysteriously absent Imager directroy.
